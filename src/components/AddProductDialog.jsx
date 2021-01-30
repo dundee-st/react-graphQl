@@ -42,6 +42,11 @@ export const AddProductDialog = ({ openNewProductDialog, handleCloseNewProductDi
         description: ''
     });
 
+    const closeAddProductsDialog = () => {
+        handleCloseNewProductDialog();
+        resetInputs();
+    }
+
     const [addProduct, { loading, error }] = useMutation(ADD_PRODUCT, {
         update: (cache, { data }) => {
             const getAllProducts = cache.readQuery({ query: GET_PRODUCTS });
@@ -51,10 +56,7 @@ export const AddProductDialog = ({ openNewProductDialog, handleCloseNewProductDi
                 data: { queryProduct: [...getAllProducts.queryProduct, newProduct] }
             });
         },
-        onCompleted: () => {
-            handleCloseNewProductDialog();
-            resetInputs();
-        },
+        onCompleted: closeAddProductsDialog,
         onError: (err) => {
             console.log(err)
         }
@@ -65,11 +67,6 @@ export const AddProductDialog = ({ openNewProductDialog, handleCloseNewProductDi
         if (inputs.title.length > 0 && inputs.price.length > 0 && !validatePrice(inputs.price)) {
             addProduct({ variables: { title: inputs.title, price: inputs.price, description: inputs.description } });
         }
-    }
-
-    const closeAddProductsDialog = () => {
-        handleCloseNewProductDialog();
-        resetInputs();
     }
 
     return (
