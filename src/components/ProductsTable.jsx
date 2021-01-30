@@ -19,18 +19,19 @@ const ProductsTable = () => {
     if (loading) return <p>Loading...</p>;
     if (error) return <p>Error :(</p>;
 
-    const handleDeleteProduct = (e) => {
-        let currentId = e.currentTarget.id;
+    const handleDeleteProduct = (id) => {
         deleteProduct({
-            variables: { id: currentId },
-            optimisticResponse: true,
+            variables: { id },
             update: (cache) => {
                 const getAllProducts = cache.readQuery({ query: GET_PRODUCTS });
-                const filteredProducts = getAllProducts.queryProduct.filter(item => (item.id !== currentId));
+                const filteredProducts = getAllProducts.queryProduct.filter(item => (item.id !== id));
                 cache.writeQuery({
                     query: GET_PRODUCTS,
                     data: { queryProduct: filteredProducts }
                 });
+            },
+            onError: (err) => {
+                console.log(err)
             }
         });
     }
@@ -53,7 +54,7 @@ const ProductsTable = () => {
                                 <TableCell align="left">{item.price}</TableCell>
                                 <TableCell align="center">{item.description}</TableCell>
                                 <TableCell align="center">
-                                    <Button variant="contained" color="secondary" id={item.id} onClick={handleDeleteProduct}>
+                                    <Button variant="contained" color="secondary" onClick={() => handleDeleteProduct(item.id)}>
                                         Delete
                                     </Button>
                                 </TableCell>
